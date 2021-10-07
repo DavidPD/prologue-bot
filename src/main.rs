@@ -9,12 +9,17 @@ struct Handler;
 struct Config {
     app_id: String,
     public_key: String,
+    token: String,
 }
 
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, context: Context, msg: Message) {
         unimplemented!();
+    }
+
+    async fn ready(&self, _ctx: Context, ready: Ready) {
+        println!("{} is connected!", ready.user.name);
     }
 }
 
@@ -23,7 +28,7 @@ async fn main() {
     let framework = StandardFramework::new().configure(|c| c.prefix("~"));
 
     let config = load_config();
-    let token = config.app_id;
+    let token = config.token;
 
     let mut client = Client::builder(token)
         .event_handler(Handler)
@@ -31,7 +36,9 @@ async fn main() {
         .await
         .expect("Couldn't create new client");
 
-    client.start().await.unwrap();
+    if let Err(why) = client.start().await {
+        println!("An error occurred in client: {:?}", why);
+    }
 }
 
 fn load_config() -> Config {
