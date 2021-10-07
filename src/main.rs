@@ -3,14 +3,10 @@ use std::{fs::File, io::Read};
 use serde::Deserialize;
 use serenity::{async_trait, framework::StandardFramework, model::prelude::*, prelude::*, Client};
 
-struct Handler;
+mod config;
+use config::Config;
 
-#[derive(Deserialize)]
-struct Config {
-    app_id: String,
-    public_key: String,
-    token: String,
-}
+struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
@@ -27,7 +23,7 @@ impl EventHandler for Handler {
 async fn main() {
     let framework = StandardFramework::new().configure(|c| c.prefix("~"));
 
-    let config = load_config();
+    let config = Config::load();
     let token = config.token;
 
     let mut client = Client::builder(token)
@@ -39,16 +35,4 @@ async fn main() {
     if let Err(why) = client.start().await {
         println!("An error occurred in client: {:?}", why);
     }
-}
-
-fn load_config() -> Config {
-    let mut file = File::open("config.toml").expect("Could not open config file");
-
-    let mut config_string = String::new();
-    file.read_to_string(&mut config_string)
-        .expect("error reading config file");
-
-    let config: Config = toml::from_str(&config_string).expect("Error parsing config file");
-
-    config
 }
