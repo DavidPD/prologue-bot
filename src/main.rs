@@ -1,6 +1,3 @@
-use std::{fs::File, io::Read};
-
-use serde::Deserialize;
 use serenity::{async_trait, framework::StandardFramework, model::prelude::*, prelude::*, Client};
 
 mod config;
