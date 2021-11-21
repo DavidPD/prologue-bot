@@ -3,13 +3,16 @@ use serenity::{async_trait, framework::StandardFramework, model::prelude::*, pre
 mod config;
 use config::Config;
 
+pub mod simple_random;
+pub use simple_random::RANDOMIZERGROUP_GROUP;
+
 struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, context: Context, msg: Message) {
-        unimplemented!();
-    }
+    // async fn message(&self, context: Context, msg: Message) {
+    //     unimplemented!();
+    // }
 
     async fn ready(&self, _ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
@@ -18,7 +21,9 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    let framework = StandardFramework::new().configure(|c| c.prefix("~"));
+    let framework = StandardFramework::new()
+        .configure(|c| c.prefix("~"))
+        .group(&RANDOMIZERGROUP_GROUP);
 
     let config = Config::load();
     let token = config.token;
