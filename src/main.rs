@@ -6,6 +6,8 @@ use config::Config;
 pub mod simple_random;
 pub use simple_random::RANDOMIZERGROUP_GROUP;
 
+pub mod deckbuilder;
+
 struct Handler;
 
 #[async_trait]
