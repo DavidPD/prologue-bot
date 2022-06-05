@@ -1,12 +1,16 @@
+use std::env;
+
+use prompt_deck::prompt_deck_commands::PROMPTDECKGROUP_GROUP;
 use serenity::{async_trait, framework::StandardFramework, model::prelude::*, prelude::*, Client};
 
 mod config;
 use config::Config;
 
-pub mod simple_random;
-pub use simple_random::RANDOMIZERGROUP_GROUP;
-
 pub mod deck;
+pub mod prompt_deck;
+pub use prompt_deck::*;
+
+pub use prompt_deck::prompt_deck_commands;
 
 struct Handler;
 
@@ -24,8 +28,8 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     let framework = StandardFramework::new()
-        .configure(|c| c.prefix("~"))
-        .group(&RANDOMIZERGROUP_GROUP);
+        .configure(|c| c.prefix("p>"))
+        .group(&PROMPTDECKGROUP_GROUP);
 
     let config = Config::load();
     let token = config.token;
