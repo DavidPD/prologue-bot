@@ -1,7 +1,4 @@
-use std::env;
-
-use prompt_deck::prompt_deck_commands::PROMPTDECKGROUP_GROUP;
-use serenity::{async_trait, framework::StandardFramework, model::prelude::*, prelude::*, Client};
+use poise::serenity_prelude as serenity;
 
 mod config;
 use config::Config;
@@ -10,37 +7,46 @@ pub mod deck;
 pub mod prompt_deck;
 pub use prompt_deck::*;
 
+pub mod poise_framework_types;
+pub use poise_framework_types::*;
+
 pub use prompt_deck::prompt_deck_commands;
 
-struct Handler;
+#[poise::command(slash_command)]
+async fn age(
+    ctx: Context<'_>,
+    #[description = "Selected user"] user: Option<serenity::User>,
+) -> Result<(), Error> {
+    let u = user.as_ref().unwrap_or(ctx.author());
+    let response = format!("{}'s account was created at {}", u.name, u.created_at());
+    ctx.say(response).await?;
+    Ok(())
+}
 
-#[async_trait]
-impl EventHandler for Handler {
-    // async fn message(&self, context: Context, msg: Message) {
-    //     unimplemented!();
-    // }
-
-    async fn ready(&self, _ctx: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
-    }
+#[poise::command(prefix_command)]
+async fn register(ctx: Context<'_>) -> Result<(), Error> {
+    poise::builtins::register_application_commands_buttons(ctx).await?;
+    Ok(())
 }
 
 #[tokio::main]
 async fn main() {
-    let framework = StandardFramework::new()
-        .configure(|c| c.prefix("p>"))
-        .group(&PROMPTDECKGROUP_GROUP);
-
     let config = Config::load();
     let token = config.token;
 
-    let mut client = Client::builder(token)
-        .event_handler(Handler)
-        .framework(framework)
-        .await
-        .expect("Couldn't create new client");
+    let commands = PromptDeck::get_commands();
 
-    if let Err(why) = client.start().await {
-        println!("An error occurred in client: {:?}", why);
-    }
+    let framework = poise::Framework::build()
+        .options(poise::FrameworkOptions {
+            commands: vec![register()],
+            ..Default::default()
+        })
+        .token(token)
+        .intents(serenity::GatewayIntents::non_privileged())
+        .user_data_setup(move |_ctx, ready, _framework| {
+            let guild_ids = ready.guilds.iter().map(|g| g.id);
+            Box::pin(async move { Ok(Data {}) })
+        });
+
+    framework.run().await.unwrap();
 }
