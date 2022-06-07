@@ -7,8 +7,8 @@ pub mod deck;
 pub mod prompt_deck;
 pub use prompt_deck::*;
 
-pub mod poise_framework_types;
-pub use poise_framework_types::*;
+pub mod bot_data;
+pub use bot_data::*;
 
 pub use prompt_deck::prompt_deck_commands;
 
@@ -34,19 +34,17 @@ async fn main() {
     let config = Config::load();
     let token = config.token;
 
-    let commands = PromptDeck::get_commands();
+    let mut commands = PromptDeck::get_commands();
+    commands.push(register());
 
     let framework = poise::Framework::build()
         .options(poise::FrameworkOptions {
-            commands: vec![register()],
+            commands: commands,
             ..Default::default()
         })
         .token(token)
         .intents(serenity::GatewayIntents::non_privileged())
-        .user_data_setup(move |_ctx, ready, _framework| {
-            let guild_ids = ready.guilds.iter().map(|g| g.id);
-            Box::pin(async move { Ok(Data {}) })
-        });
+        .user_data_setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(Data {}) }));
 
     framework.run().await.unwrap();
 }

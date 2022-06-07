@@ -1,19 +1,16 @@
-use poise::{_GetGenerics, serenity_prelude as serenity};
+use poise::serenity_prelude as serenity;
 
 pub mod prompt_deck_commands;
 
-use crate::poise_framework_types::*;
+use crate::bot_data::*;
 
 pub struct PromptDeck {}
 
 impl PromptDeck {
+    /// Draw a prompt card from the current deck.
     #[poise::command(slash_command)]
-    async fn draw(
-        ctx: Context<'_>,
-        #[description = "Selected user"] user: Option<serenity::User>,
-    ) -> Result<(), Error> {
-        let u = user.as_ref().unwrap_or(ctx.author());
-        let response = format!("{}'s account was created at {}", u.name, u.created_at());
+    async fn draw(ctx: Context<'_>) -> Result<(), Error> {
+        let response = format!("It's the Ace of tests!");
         ctx.say(response).await?;
         Ok(())
     }
