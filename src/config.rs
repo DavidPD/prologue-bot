@@ -5,6 +5,7 @@ pub struct Config {
     pub app_id: String,
     pub public_key: String,
     pub token: String,
+    pub prompt_file_location: String,
 }
 
 impl Config {

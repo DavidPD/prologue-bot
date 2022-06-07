@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{path::Path, sync::Arc};
 
 use poise::serenity_prelude::{self as serenity, RwLock};
 
@@ -35,6 +35,7 @@ async fn register(ctx: Context<'_>) -> Result<(), Error> {
 async fn main() {
     let config = Config::load();
     let token = config.token;
+    let prompt_file_location = config.prompt_file_location;
 
     let mut commands = PromptDeck::get_commands();
     commands.push(register());
@@ -47,7 +48,12 @@ async fn main() {
         .token(token)
         .intents(serenity::GatewayIntents::non_privileged())
         .user_data_setup(move |_ctx, _ready, _framework| {
-            Box::pin(async move { Ok(Arc::new(RwLock::new(Data::default()))) })
+            Box::pin(async move {
+                Ok(Arc::new(RwLock::new(Data {
+                    deck_location: prompt_file_location,
+                    ..Default::default()
+                })))
+            })
         });
 
     framework.run().await.unwrap();
