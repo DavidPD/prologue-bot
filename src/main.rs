@@ -1,4 +1,6 @@
-use poise::serenity_prelude as serenity;
+use std::sync::Arc;
+
+use poise::serenity_prelude::{self as serenity, RwLock};
 
 mod config;
 use config::Config;
@@ -44,7 +46,9 @@ async fn main() {
         })
         .token(token)
         .intents(serenity::GatewayIntents::non_privileged())
-        .user_data_setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(Data {}) }));
+        .user_data_setup(move |_ctx, _ready, _framework| {
+            Box::pin(async move { Ok(Arc::new(RwLock::new(Data::default()))) })
+        });
 
     framework.run().await.unwrap();
 }
