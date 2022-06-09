@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use rand::prelude::{Rng, SliceRandom};
+use rand::prelude::SliceRandom;
 use tap::Tap;
 pub trait TCardType
 where
@@ -11,7 +11,7 @@ where
 
 #[derive(Default)]
 pub struct Deck<CardType: TCardType> {
-    all_cards: Vec<CardType>,
+    pub all_cards: Vec<CardType>,
     draw_pile: Vec<CardType>,
     discard_pile: Vec<CardType>,
 }

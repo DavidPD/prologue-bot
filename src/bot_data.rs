@@ -1,5 +1,5 @@
 use crate::PromptDeckData;
-use std::{path::Path, sync::Arc};
+use std::sync::Arc;
 use tokio::sync::RwLock;
 
 pub type Error = Box<dyn std::error::Error + Send + Sync>;

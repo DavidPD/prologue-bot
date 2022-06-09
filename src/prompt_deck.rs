@@ -3,8 +3,6 @@ use std::{fmt::Display, fs, sync::Arc};
 use tap::Tap;
 use tokio::sync::RwLock;
 
-use poise::serenity_prelude as serenity;
-
 pub mod prompt_deck_commands;
 pub mod prompt_deck_loader;
 
@@ -67,7 +65,8 @@ pub struct PromptCard {
 
 impl Display for PromptCard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.prompt.as_str());
+        f.write_str(self.prompt.as_str())
+            .expect("error writing output");
         Ok(())
     }
 }

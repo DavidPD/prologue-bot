@@ -1,4 +1,4 @@
-use std::{path::Path, sync::Arc};
+use std::sync::Arc;
 
 use poise::serenity_prelude::{self as serenity, RwLock};
 
