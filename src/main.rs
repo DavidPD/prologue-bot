@@ -12,8 +12,6 @@ pub use prompt_deck::*;
 pub mod bot_data;
 pub use bot_data::*;
 
-pub use prompt_deck::prompt_deck_commands;
-
 #[poise::command(slash_command)]
 async fn age(
     ctx: Context<'_>,

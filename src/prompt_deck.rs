@@ -3,7 +3,6 @@ use std::{fmt::Display, fs, sync::Arc};
 use tap::Tap;
 use tokio::sync::RwLock;
 
-pub mod prompt_deck_commands;
 pub mod prompt_deck_loader;
 
 use crate::{
