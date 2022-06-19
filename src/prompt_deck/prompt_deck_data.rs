@@ -12,7 +12,7 @@ pub struct PromptDeckData {
 }
 
 impl PromptDeckData {
-    pub fn start_session() {
+    pub fn start_session(&mut self, name: &str) {
         todo!();
     }
 

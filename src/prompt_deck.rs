@@ -47,7 +47,12 @@ impl PromptDeck {
     }
 
     #[poise::command(slash_command)]
-    async fn start_prompt_session(ctx: Context<'_>) -> Result<(), Error> {
+    async fn start_prompt_session(
+        ctx: Context<'_>,
+        #[description = "A name for your prompt session (required)"] name: String,
+    ) -> Result<(), Error> {
+        let mut data_write = ctx.data().write().await;
+        data_write.prompt_deck.start_session(name.as_str());
         todo!();
     }
 
