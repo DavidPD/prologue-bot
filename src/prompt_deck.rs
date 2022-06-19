@@ -1,4 +1,4 @@
-use std::{fs, sync::Arc};
+use std::{fs, result, sync::Arc};
 
 use tap::Tap;
 use tokio::sync::RwLock;
@@ -52,17 +52,32 @@ impl PromptDeck {
         #[description = "A name for your prompt session (required)"] name: String,
     ) -> Result<(), Error> {
         let mut data_write = ctx.data().write().await;
-        data_write.prompt_deck.start_session(name.as_str());
-        todo!();
+        let result = data_write.prompt_deck.start_session(name.as_str());
+
+        match result {
+            Ok(message) => ctx.say(message).await?,
+            Err(message) => ctx.say(message).await?,
+        };
+
+        Ok(())
     }
 
     #[poise::command(slash_command)]
     async fn end_prompt_session(ctx: Context<'_>) -> Result<(), Error> {
         let mut data_write = ctx.data().write().await;
 
-        data_write.prompt_deck.end_session();
+        let result = data_write.prompt_deck.end_session();
 
-        todo!();
+        match result {
+            Ok(message) => {
+                ctx.say(format!("session ended \"{}\"", message)).await?;
+            }
+            Err(_) => {
+                ctx.say("There is no prompt session in progress").await?;
+            }
+        }
+
+        Ok(())
     }
 
     #[poise::command(slash_command)]
@@ -76,6 +91,11 @@ impl PromptDeck {
     }
 
     pub fn get_commands() -> Vec<poise::Command<Arc<RwLock<Data>>, Error>> {
-        vec![Self::draw(), Self::list_decks()]
+        vec![
+            Self::draw(),
+            Self::list_decks(),
+            Self::start_prompt_session(),
+            Self::end_prompt_session(),
+        ]
     }
 }
