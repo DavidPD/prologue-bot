@@ -82,7 +82,9 @@ impl PromptDeck {
 
     #[poise::command(slash_command)]
     async fn add_deck(ctx: Context<'_>) -> Result<(), Error> {
-        todo!();
+        let mut data_write = ctx.data().write().await;
+
+        Ok(())
     }
 
     #[poise::command(slash_command)]

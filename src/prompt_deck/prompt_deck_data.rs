@@ -1,6 +1,9 @@
 use std::{collections::HashMap, fmt::Display};
 
-use crate::deck::{Deck, TCardType};
+use crate::{
+    deck::{Deck, TCardType},
+    prompt_deck_loader::PromptDeckLoader,
+};
 
 #[derive(Default)]
 pub struct PromptDeckData {
@@ -43,6 +46,25 @@ impl PromptDeckData {
             }
             None => Err(()),
         }
+    }
+
+    pub fn add_deck(&mut self, deck_name: String) -> Result<String, String> {
+        self.current_session = match self.current_session.take() {
+            Some(current_session) => {
+                let new_deck = PromptDeckLoader::load_deck(deck_name.as_str());
+                self.deck.shuffle_in_deck(new_deck.unwrap());
+
+                Some(current_session)
+            }
+            None => {
+                return Err(
+                    "There is no session in progress, start one with `/start_prompt_session`"
+                        .into(),
+                )
+            }
+        };
+
+        todo!()
     }
 }
 

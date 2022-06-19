@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{BufRead, BufReader},
+    io::{self, BufRead, BufReader},
 };
 
 use crate::{deck::Deck, PromptCard};
@@ -8,10 +8,16 @@ use crate::{deck::Deck, PromptCard};
 pub struct PromptDeckLoader {}
 
 impl PromptDeckLoader {
-    pub fn load_deck(path: &str) -> Deck<PromptCard> {
-        let reader = BufReader::new(File::open(path).expect("cannot open deck file"));
+    pub fn load_deck(path: &str) -> Result<Deck<PromptCard>, String> {
+        let reader = open_file(path)?;
 
-        let mut lines = reader.lines().into_iter().map(|line| line.unwrap());
+        // magic: .collect() can transform an iterator of Result<T, E> into a Result<Vec<T>, E>!
+        let mut lines = match reader.lines().collect::<Result<Vec<String>, io::Error>>() {
+            Ok(lines) => lines.into_iter(),
+            Err(_) => {
+                return Err("Error reading file".into());
+            }
+        };
 
         let mut cards: Vec<PromptCard> = vec![];
 
@@ -33,15 +39,30 @@ impl PromptDeckLoader {
             })
         }
 
-        return Deck::<PromptCard>::new(cards);
+        return Ok(Deck::<PromptCard>::new(cards));
     }
 }
 
-#[test]
-fn test_load_deck() {
-    let deck = PromptDeckLoader::load_deck("Assets/Prompt Files/test_deck.md");
+fn open_file(path: &str) -> Result<std::io::BufReader<std::fs::File>, &'static str> {
+    let file = File::open(path);
 
-    assert_eq!(deck.all_cards.iter().count(), 3);
-    assert_eq!(deck.all_cards.first().unwrap().prompt.lines().count(), 1);
-    assert_eq!(deck.all_cards.last().unwrap().prompt.lines().count(), 3);
+    match file {
+        Ok(file) => Ok(BufReader::new(file)),
+        Err(_) => Err("Error finding prompt deck, use `/list_decks` to see all valid decks"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_load_deck() {
+        let deck = PromptDeckLoader::load_deck("Assets/Prompt Files/test_deck.md")
+            .expect("Error opening file");
+
+        assert_eq!(deck.all_cards.iter().count(), 3);
+        assert_eq!(deck.all_cards.first().unwrap().prompt.lines().count(), 1);
+        assert_eq!(deck.all_cards.last().unwrap().prompt.lines().count(), 3);
+    }
 }
