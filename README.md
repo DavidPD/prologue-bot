@@ -26,6 +26,10 @@ You'll also be able to mix and match decks based on groups of prompts defined in
 - Sessions saved to a database for later retrieval and persistence when restarting
 - Message parsing so you don't have to reply for your answers to be saved.
 
+## Disclaimer
+
+I'm building this mostly for fun in my spare time so maintenance may be sparse and new features slow to develop. I'm also very new to Rust and while I'm trying to do things cleanly I've got a lot to learn. 
+
 ## Contributing
 
-If you're interested in helping out contact me in PTP. I know this would be easier in another language but for now I'm doing this mostly for fun.
+If you're interested in helping out contact me in PTP.
