@@ -1,11 +1,5 @@
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    result,
-    sync::Arc,
-};
+use std::{fs, path::Path, sync::Arc};
 
-use tap::Tap;
 use tokio::sync::RwLock;
 
 pub mod prompt_deck_data;
