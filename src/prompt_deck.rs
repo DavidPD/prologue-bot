@@ -1,4 +1,9 @@
-use std::{fs, result, sync::Arc};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    result,
+    sync::Arc,
+};
 
 use tap::Tap;
 use tokio::sync::RwLock;
@@ -16,16 +21,17 @@ impl PromptDeck {
     /// Draw a prompt card from the current deck.
     #[poise::command(slash_command)]
     async fn draw(ctx: Context<'_>) -> Result<(), Error> {
-        let count = {
-            let mut data_write = ctx.data().write().await;
-            data_write
-                .prompt_deck
-                .number_of_cards_drawn
-                .tap(move |_| data_write.prompt_deck.number_of_cards_drawn += 1)
+        let mut data_write = ctx.data().write().await;
+
+        let result = data_write.prompt_deck.draw_prompt();
+
+        let response = match result {
+            Some(prompt) => prompt,
+            None => "You're all out of cards, use `/add_deck` to add more".into(),
         };
 
-        let response = format!("It's the Ace of tests! Which you've drawn {} times", count);
         ctx.say(response).await?;
+
         Ok(())
     }
 
@@ -81,8 +87,26 @@ impl PromptDeck {
     }
 
     #[poise::command(slash_command)]
-    async fn add_deck(ctx: Context<'_>) -> Result<(), Error> {
+    async fn add_deck(
+        ctx: Context<'_>,
+        #[description = "The name of the deck to add"] name: String,
+    ) -> Result<(), Error> {
         let mut data_write = ctx.data().write().await;
+
+        let file_name = format!("{name}.md");
+
+        let mut deck_path = Path::new(data_write.deck_location.as_str()).to_path_buf();
+        deck_path.push(file_name);
+
+        let result = data_write.prompt_deck.add_deck(deck_path.to_str().unwrap());
+
+        match result {
+            Ok(_) => ctx.say(format!("Loaded deck {name}")).await?,
+            Err(_) => {
+                ctx.say(format!("There was an error loading deck {name}"))
+                    .await?
+            }
+        };
 
         Ok(())
     }
@@ -94,10 +118,11 @@ impl PromptDeck {
 
     pub fn get_commands() -> Vec<poise::Command<Arc<RwLock<Data>>, Error>> {
         vec![
-            Self::draw(),
             Self::list_decks(),
             Self::start_prompt_session(),
             Self::end_prompt_session(),
+            Self::add_deck(),
+            Self::draw(),
         ]
     }
 }

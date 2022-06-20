@@ -48,10 +48,11 @@ impl PromptDeckData {
         }
     }
 
-    pub fn add_deck(&mut self, deck_name: String) -> Result<String, String> {
+    pub fn add_deck(&mut self, deck_name: impl Into<String>) -> Result<String, String> {
+        let deck_name = deck_name.into();
         self.current_session = match self.current_session.take() {
             Some(current_session) => {
-                let new_deck = PromptDeckLoader::load_deck(deck_name.as_str());
+                let new_deck = PromptDeckLoader::load_deck(deck_name.clone());
                 self.deck.shuffle_in_deck(new_deck.unwrap());
 
                 Some(current_session)
@@ -64,7 +65,14 @@ impl PromptDeckData {
             }
         };
 
-        todo!()
+        Ok(deck_name)
+    }
+
+    /// Returns None when out of cards
+    pub fn draw_prompt(&mut self) -> Option<String> {
+        let card = self.deck.draw_card();
+
+        card.map(|card| card.prompt)
     }
 }
 

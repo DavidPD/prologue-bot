@@ -42,6 +42,8 @@ impl<CardType: TCardType> Deck<CardType> {
 
     pub fn shuffle_in_deck(&mut self, deck: Deck<CardType>) {
         self.all_cards.append(deck.all_cards.clone().as_mut());
+        self.draw_pile.append(deck.all_cards.clone().as_mut());
+        self.draw_pile.shuffle(&mut rand::thread_rng())
     }
 }
 

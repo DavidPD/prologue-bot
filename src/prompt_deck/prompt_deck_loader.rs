@@ -8,8 +8,8 @@ use crate::{deck::Deck, PromptCard};
 pub struct PromptDeckLoader {}
 
 impl PromptDeckLoader {
-    pub fn load_deck(path: &str) -> Result<Deck<PromptCard>, String> {
-        let reader = open_file(path)?;
+    pub fn load_deck(path: impl Into<String>) -> Result<Deck<PromptCard>, String> {
+        let reader = open_file(path.into().as_str())?;
 
         // magic: .collect() can transform an iterator of Result<T, E> into a Result<Vec<T>, E>!
         let mut lines = match reader.lines().collect::<Result<Vec<String>, io::Error>>() {
@@ -61,7 +61,7 @@ mod tests {
         let deck = PromptDeckLoader::load_deck("Assets/Prompt Files/test_deck.md")
             .expect("Error opening file");
 
-        assert_eq!(deck.all_cards.iter().count(), 3);
+        assert_eq!(deck.all_cards.iter().count(), 4);
         assert_eq!(deck.all_cards.first().unwrap().prompt.lines().count(), 1);
         assert_eq!(deck.all_cards.last().unwrap().prompt.lines().count(), 3);
     }
