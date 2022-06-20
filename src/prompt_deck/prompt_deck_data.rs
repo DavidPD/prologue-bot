@@ -7,7 +7,6 @@ use crate::{
 
 #[derive(Default)]
 pub struct PromptDeckData {
-    pub number_of_cards_drawn: i32,
     pub deck: Deck<PromptCard>,
     pub current_session: Option<PromptDeckSession>,
     pub last_session: Option<PromptDeckSession>,
@@ -76,13 +75,22 @@ impl PromptDeckData {
     }
 }
 
+#[derive(Default)]
 pub struct PromptDeckSession {
     pub name: String,
+    pub deck: Deck<PromptCard>,
 }
 
 impl PromptDeckSession {
     pub fn new(name: &str) -> PromptDeckSession {
-        PromptDeckSession { name: name.into() }
+        PromptDeckSession {
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+
+    pub fn add_deck(&mut self, deck: Deck<PromptCard>) {
+        self.deck.shuffle_in_deck(deck);
     }
 }
 
