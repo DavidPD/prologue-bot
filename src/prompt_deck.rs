@@ -1,5 +1,9 @@
-use std::{fs, path::Path, sync::Arc};
+use std::{fs, path::Path, sync::Arc, vec};
 
+use poise::{
+    serenity_prelude::{autocomplete, CreateAutocompleteResponse},
+    AutocompleteChoice, BoxFuture, SlashArgError,
+};
 use tokio::sync::RwLock;
 
 pub mod prompt_deck_data;
@@ -50,6 +54,9 @@ impl PromptDeck {
     async fn start_prompt_session(
         ctx: Context<'_>,
         #[description = "A name for your prompt session (required)"] name: String,
+        #[autocomplete = "Self::test"]
+        #[description = "deck name"]
+        deck_name: Option<String>,
     ) -> Result<(), Error> {
         let mut data_write = ctx.data().write().await;
         let result = data_write.prompt_deck.start_session(name.as_str());
@@ -60,6 +67,13 @@ impl PromptDeck {
         };
 
         Ok(())
+    }
+
+    async fn test(ctx: Context<'_>, name: String) -> Vec<AutocompleteChoice<String>> {
+        return vec![AutocompleteChoice {
+            name: "test".into(),
+            value: "test".into(),
+        }];
     }
 
     #[poise::command(slash_command)]
