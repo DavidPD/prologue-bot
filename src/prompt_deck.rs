@@ -1,9 +1,13 @@
-use std::{fs, path::Path, sync::Arc, vec};
-
-use poise::{
-    serenity_prelude::{autocomplete, CreateAutocompleteResponse},
-    AutocompleteChoice, BoxFuture, SlashArgError,
+use std::{
+    fmt::format,
+    fs::{self, DirEntry},
+    io,
+    path::Path,
+    sync::Arc,
+    vec,
 };
+
+use poise::AutocompleteChoice;
 use tokio::sync::RwLock;
 
 pub mod prompt_deck_data;
@@ -54,26 +58,62 @@ impl PromptDeck {
     async fn start_prompt_session(
         ctx: Context<'_>,
         #[description = "A name for your prompt session (required)"] name: String,
-        #[autocomplete = "Self::test"]
-        #[description = "deck name"]
-        deck_name: Option<String>,
+        #[autocomplete = "Self::autocomplete_deck_name"]
+        #[description = "starting deck name"]
+        starting_deck: Option<String>,
     ) -> Result<(), Error> {
         let mut data_write = ctx.data().write().await;
         let result = data_write.prompt_deck.start_session(name.as_str());
 
         match result {
-            Ok(message) => ctx.say(message).await?,
-            Err(message) => ctx.say(message).await?,
+            Ok(session_message) => {
+                if let Some(name) = starting_deck {
+                    let file_name = format!("{name}.md");
+
+                    let mut deck_path = Path::new(data_write.deck_location.as_str()).to_path_buf();
+                    deck_path.push(file_name);
+
+                    data_write
+                        .prompt_deck
+                        .add_deck(deck_path.to_str().unwrap())?;
+
+                    ctx.say(format!("{session_message} with deck {name}"))
+                        .await?;
+                } else {
+                    ctx.say(session_message).await?;
+                }
+            }
+            Err(message) => {
+                ctx.say(message).await?;
+            }
         };
 
         Ok(())
     }
 
-    async fn test(ctx: Context<'_>, name: String) -> Vec<AutocompleteChoice<String>> {
-        return vec![AutocompleteChoice {
-            name: "test".into(),
-            value: "test".into(),
-        }];
+    async fn autocomplete_deck_name(
+        ctx: Context<'_>,
+        _name: String,
+    ) -> Vec<AutocompleteChoice<String>> {
+        let location = ctx.data().read().await.deck_location.clone();
+
+        let mut result: Vec<AutocompleteChoice<String>> = vec![];
+        let paths = fs::read_dir(location).unwrap();
+        for path in paths {
+            if let Some(name) = Self::get_deck_name(path) {
+                let choice = AutocompleteChoice {
+                    name: name.clone(),
+                    value: name,
+                };
+                result.push(choice);
+            }
+        }
+
+        return result;
+    }
+
+    fn get_deck_name(path: Result<DirEntry, io::Error>) -> Option<String> {
+        Some(path.ok()?.path().file_stem()?.to_str()?.to_owned())
     }
 
     #[poise::command(slash_command)]
