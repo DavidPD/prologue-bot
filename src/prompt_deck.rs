@@ -137,7 +137,9 @@ impl PromptDeck {
     #[poise::command(slash_command)]
     async fn add_deck(
         ctx: Context<'_>,
-        #[description = "The name of the deck to add"] name: String,
+        #[autocomplete = "Self::autocomplete_deck_name"]
+        #[description = "The name of the deck to add"]
+        name: String,
     ) -> Result<(), Error> {
         let mut data_write = ctx.data().write().await;
 

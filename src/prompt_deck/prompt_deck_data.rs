@@ -7,7 +7,6 @@ use crate::{
 
 #[derive(Default)]
 pub struct PromptDeckData {
-    pub deck: Deck<PromptCard>,
     pub current_session: Option<PromptDeckSession>,
     pub last_session: Option<PromptDeckSession>,
     pub previous_sessions: HashMap<String, PromptDeckSession>,
@@ -50,9 +49,9 @@ impl PromptDeckData {
     pub fn add_deck(&mut self, deck_name: impl Into<String>) -> Result<String, String> {
         let deck_name = deck_name.into();
         self.current_session = match self.current_session.take() {
-            Some(current_session) => {
+            Some(mut current_session) => {
                 let new_deck = PromptDeckLoader::load_deck(deck_name.clone());
-                self.deck.shuffle_in_deck(new_deck.unwrap());
+                current_session.deck.shuffle_in_deck(new_deck.unwrap());
 
                 Some(current_session)
             }
@@ -69,9 +68,10 @@ impl PromptDeckData {
 
     /// Returns None when out of cards
     pub fn draw_prompt(&mut self) -> Option<String> {
-        let card = self.deck.draw_card();
-
-        card.map(|card| card.prompt)
+        self.current_session
+            .as_mut()?
+            .draw_prompt_card()
+            .map(|card| card.prompt)
     }
 }
 
@@ -91,6 +91,10 @@ impl PromptDeckSession {
 
     pub fn add_deck(&mut self, deck: Deck<PromptCard>) {
         self.deck.shuffle_in_deck(deck);
+    }
+
+    pub fn draw_prompt_card(&mut self) -> Option<PromptCard> {
+        self.deck.draw_card()
     }
 }
 
