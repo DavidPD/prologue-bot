@@ -1,5 +1,7 @@
 use std::{collections::HashMap, fmt::Display};
 
+use poise::serenity_prelude::{MessageId, UserId};
+
 use crate::{
     deck::{Deck, TCardType},
     prompt_deck_loader::PromptDeckLoader,
@@ -79,6 +81,7 @@ impl PromptDeckData {
 pub struct PromptDeckSession {
     pub name: String,
     pub deck: Deck<PromptCard>,
+    pub presented_cards: Vec<PresentedPromptCard>,
 }
 
 impl PromptDeckSession {
@@ -96,6 +99,11 @@ impl PromptDeckSession {
     pub fn draw_prompt_card(&mut self) -> Option<PromptCard> {
         self.deck.draw_card()
     }
+
+    pub fn add_presented_card(&mut self, prompt_message_id: MessageId, prompt: String) {
+        self.presented_cards
+            .push(PresentedPromptCard::new(prompt_message_id, prompt));
+    }
 }
 
 #[derive(Clone, Default)]
@@ -109,6 +117,28 @@ impl Display for PromptCard {
             .expect("error writing output");
         Ok(())
     }
+}
+
+// This holds all the data related to people answering specific prompts
+pub struct PresentedPromptCard {
+    pub prompt_message: MessageId,
+    pub prompt: String,
+    pub answers: Vec<PromptAnswer>,
+}
+
+impl PresentedPromptCard {
+    pub fn new(prompt_message: MessageId, prompt: String) -> Self {
+        Self {
+            prompt_message,
+            prompt,
+            answers: vec![],
+        }
+    }
+}
+
+pub struct PromptAnswer {
+    pub user_id: UserId,
+    pub answer: String,
 }
 
 impl TCardType for PromptCard {}

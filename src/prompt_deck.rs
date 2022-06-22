@@ -7,7 +7,7 @@ use std::{
     vec,
 };
 
-use poise::AutocompleteChoice;
+use poise::{futures_util::StreamExt, AutocompleteChoice};
 use tokio::sync::RwLock;
 
 pub mod prompt_deck_data;
@@ -25,14 +25,21 @@ impl PromptDeck {
     async fn draw(ctx: Context<'_>) -> Result<(), Error> {
         let mut data_write = ctx.data().write().await;
 
-        let result = data_write.prompt_deck.draw_prompt();
+        let response = {
+            let result = data_write.prompt_deck.draw_prompt();
 
-        let response = match result {
-            Some(prompt) => prompt,
-            None => "You're all out of cards, use `/add_deck` to add more".into(),
+            match result {
+                Some(prompt) => prompt,
+                None => "You're all out of cards, use `/add_deck` to add more".into(),
+            }
         };
 
-        ctx.say(response).await?;
+        let message = ctx.say(response).await?.message().await?;
+
+        ctx.channel_id()
+            .await_replies(&ctx.discord())
+            .build()
+            .then(|message| async move {});
 
         Ok(())
     }
