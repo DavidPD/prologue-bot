@@ -34,12 +34,7 @@ impl PromptDeck {
             }
         };
 
-        let message = ctx.say(response).await?.message().await?;
-
-        ctx.channel_id()
-            .await_replies(&ctx.discord())
-            .build()
-            .then(|message| async move {});
+        ctx.say(response).await?;
 
         Ok(())
     }
