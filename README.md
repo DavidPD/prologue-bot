@@ -1,35 +1,39 @@
 # prologue-bot
 
-This is a custom Discord Bot specifically built for the Prolonging the Prologue community, written in Rust because I wanted a project to help me learn the language.
+This is a custom Discord Bot built for the Prolonging the Prologue Creative Community: a group of storytellers exploring writing, illustration, game development, acting, and more.
 
-Prolonging the Prologue is a community of creatives on Discord, and I'm building this as an attempt to make something helpful but keep it fairly simple.
+I wrote the bot using Rust to learn the language while making something helpful and fairly simple.
 
-The bot will be built as multiple modules as features are added and each module will be separated from any other features in the bot.
+## Built With
 
-## Prompt Deck
+- [Rust](https://www.rust-lang.org/)
+- [Poise](https://lib.rs/crates/poise)
 
-A customizable prompt deck that allows writers to "draw" random character and worldbuilding prompts out of a predetermined list.
-You'll also be able to mix and match decks based on groups of prompts defined in markdown files separated by horizontal rules `---`.
+## Features
 
-### Prompt Deck Commands
+### Prompt Deck
+
+The Bot's customizable deck allows writers to "draw" random character and worldbuilding prompts out of a predetermined list. You can also mix and match decks using prompt groups. These groups are stored in separate files where each prompt is separating by horizontal rules (`---`).
+
+#### Prompt Deck Commands
 
 - `/draw`: Randomly selects a card from the current deck.
 - `/list-decks`: Prints a list of all available prompt decks.
 - `/add-deck`: Adds all prompts from a given prompt deck.
+- `/start-prompt-session <session-name>`: Starts a prompt session with an optional name. Gives an error if there is already a named session in progress.
 - `/end-prompt-session`: Resets the current deck and ends a prompting session.
-- `/start-prompt-session <session-name>`: Starts a prompt session with an optional name, gives an error if there is already a named session in progress.
-- `/export-prompt-answers`: Exports all the answers you personally gave (by replying to the bot) in the current or previous session.
 
-### Potential future prompt features
+#### Tentative Roadmap
 
 - Multiple sessions
 - Sessions saved to a database for later retrieval and persistence when restarting
-- Message parsing so you don't have to reply for your answers to be saved.
+- Message tracking so the bot can send you a list of your own replies after a prompt session
+- A database of cards that can be added to dynamically
 
 ## Disclaimer
 
-I'm building this mostly for fun in my spare time so maintenance may be sparse and new features slow to develop. I'm also very new to Rust and while I'm trying to do things cleanly I've got a lot to learn. 
+I'm building this mostly for fun in my spare time so maintenance may be sparse and new features slow to develop.
 
 ## Contributing
 
-If you're interested in helping out contact me in PTP.
+I'm not looking for contributions at the moment.
