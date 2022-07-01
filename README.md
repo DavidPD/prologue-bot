@@ -36,4 +36,6 @@ I'm building this mostly for fun in my spare time so maintenance may be sparse a
 
 ## Contributing
 
-I'm not looking for contributions at the moment.
+I'm not looking for code contributions at the moment.
+
+If you would like to contribute prompts feel free to fork the repository and make a PR, or contact one of the Prolonging the Prologue mods.
