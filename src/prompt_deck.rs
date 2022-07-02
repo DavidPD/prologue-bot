@@ -3,6 +3,7 @@ use std::{
     fs::{self, DirEntry},
     io,
     path::Path,
+    result,
     sync::Arc,
     vec,
 };
@@ -44,14 +45,19 @@ impl PromptDeck {
         // let decks =
         let location = ctx.data().read().await.deck_location.clone();
 
-        let mut result: Vec<String> = vec![];
-        let paths = fs::read_dir(location).unwrap();
-        for path in paths {
-            result.push(path?.file_name().into_string().unwrap());
-        }
+        // let mut result: Vec<String> = vec![];
 
-        let response = format!("decks: \n {}", result.join("\n"));
-        ctx.say(response).await?;
+        let result = get_available_decks(location);
+
+        match result {
+            Ok(result) => {
+                let response = format!("decks: \n {}", result.join("\n"));
+                ctx.say(response).await?;
+            }
+            Err(message) => {
+                ctx.say(message).await?;
+            }
+        }
 
         Ok(())
     }
@@ -99,23 +105,16 @@ impl PromptDeck {
     ) -> Vec<AutocompleteChoice<String>> {
         let location = ctx.data().read().await.deck_location.clone();
 
-        let mut result: Vec<AutocompleteChoice<String>> = vec![];
-        let paths = fs::read_dir(location).unwrap();
-        for path in paths {
-            if let Some(name) = Self::get_deck_name(path) {
-                let choice = AutocompleteChoice {
+        match get_available_decks(location) {
+            Ok(deck_names) => deck_names
+                .iter()
+                .map(|name| AutocompleteChoice {
                     name: name.clone(),
-                    value: name,
-                };
-                result.push(choice);
-            }
+                    value: name.clone(),
+                })
+                .collect(),
+            Err(_) => vec![],
         }
-
-        return result;
-    }
-
-    fn get_deck_name(path: Result<DirEntry, io::Error>) -> Option<String> {
-        Some(path.ok()?.path().file_stem()?.to_str()?.to_owned())
     }
 
     #[poise::command(slash_command)]
@@ -177,4 +176,21 @@ impl PromptDeck {
             Self::draw(),
         ]
     }
+}
+
+fn get_deck_name(path: Result<DirEntry, io::Error>) -> Option<String> {
+    Some(path.ok()?.path().file_stem()?.to_str()?.to_owned())
+}
+
+fn get_available_decks(deck_location: String) -> Result<Vec<String>, String> {
+    let mut result: Vec<String> = vec![];
+    let paths = fs::read_dir(deck_location).map_err(|_| "Error reading list of files")?;
+
+    for path in paths {
+        if let Some(name) = get_deck_name(path) {
+            result.push(name);
+        }
+    }
+
+    Ok(result)
 }
