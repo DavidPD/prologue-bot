@@ -15,7 +15,7 @@ pub struct PromptDeckData {
 }
 
 impl PromptDeckData {
-    pub fn start_session(&mut self, name: &str) -> Result<String, String> {
+    pub fn start_session(&mut self) -> Result<String, String> {
         if self.current_session.is_some() {
             return Err(
                 "There is already a session in progress, use `/end_prompt_session` to end it"
@@ -23,9 +23,9 @@ impl PromptDeckData {
             );
         }
 
-        self.current_session = Some(PromptDeckSession::new(name));
+        self.current_session = Some(PromptDeckSession::new());
 
-        Ok(format!("Started a new session \"{}\"", name))
+        Ok(format!("Started a new prompt session"))
     }
 
     pub fn end_session(&mut self) -> Result<String, ()> {
@@ -85,9 +85,8 @@ pub struct PromptDeckSession {
 }
 
 impl PromptDeckSession {
-    pub fn new(name: &str) -> PromptDeckSession {
+    pub fn new() -> PromptDeckSession {
         PromptDeckSession {
-            name: name.into(),
             ..Default::default()
         }
     }

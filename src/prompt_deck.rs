@@ -60,31 +60,26 @@ impl PromptDeck {
     #[poise::command(slash_command)]
     async fn start_prompt_session(
         ctx: Context<'_>,
-        #[description = "A name for your prompt session (required)"] name: String,
         #[autocomplete = "Self::autocomplete_deck_name"]
         #[description = "starting deck name"]
-        starting_deck: Option<String>,
+        starting_deck: String,
     ) -> Result<(), Error> {
         let mut data_write = ctx.data().write().await;
-        let result = data_write.prompt_deck.start_session(name.as_str());
+        let result = data_write.prompt_deck.start_session();
 
         match result {
             Ok(session_message) => {
-                if let Some(name) = starting_deck {
-                    let file_name = format!("{name}.md");
+                let file_name = format!("{starting_deck}.md");
 
-                    let mut deck_path = Path::new(data_write.deck_location.as_str()).to_path_buf();
-                    deck_path.push(file_name);
+                let mut deck_path = Path::new(data_write.deck_location.as_str()).to_path_buf();
+                deck_path.push(file_name);
 
-                    data_write
-                        .prompt_deck
-                        .add_deck(deck_path.to_str().unwrap())?;
+                data_write
+                    .prompt_deck
+                    .add_deck(deck_path.to_str().unwrap())?;
 
-                    ctx.say(format!("{session_message} with deck {name}"))
-                        .await?;
-                } else {
-                    ctx.say(session_message).await?;
-                }
+                ctx.say(format!("{session_message} with deck {starting_deck}"))
+                    .await?;
             }
             Err(message) => {
                 ctx.say(message).await?;
