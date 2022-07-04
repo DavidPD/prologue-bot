@@ -76,9 +76,11 @@ impl PromptDeck {
                 let mut deck_path = Path::new(data_write.deck_location.as_str()).to_path_buf();
                 deck_path.push(file_name);
 
-                data_write
-                    .prompt_deck
-                    .add_deck(deck_path.to_str().unwrap())?;
+                data_write.prompt_deck.add_deck(
+                    deck_path
+                        .to_str()
+                        .expect("There was a problem starting session"),
+                )?;
 
                 ctx.say(format!("{session_message} with deck {starting_deck}"))
                     .await?;
@@ -95,7 +97,7 @@ impl PromptDeck {
         ctx: Context<'_>,
         _name: String,
     ) -> Vec<AutocompleteChoice<String>> {
-        let location = ctx.data().read().await.deck_location.clone();
+        let location = { ctx.data().read().await.deck_location.clone() };
 
         match get_available_decks(location) {
             Ok(deck_names) => deck_names
@@ -141,7 +143,11 @@ impl PromptDeck {
         let mut deck_path = Path::new(data_write.deck_location.as_str()).to_path_buf();
         deck_path.push(file_name);
 
-        let result = data_write.prompt_deck.add_deck(deck_path.to_str().unwrap());
+        let result = data_write.prompt_deck.add_deck(
+            deck_path
+                .to_str()
+                .expect("There was an error adding a deck"),
+        );
 
         match result {
             Ok(_) => ctx.say(format!("Loaded deck {name}")).await?,

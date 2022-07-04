@@ -43,5 +43,8 @@ async fn main() {
             })
         });
 
-    framework.run().await.unwrap();
+    framework
+        .run()
+        .await
+        .expect("There was a problem running the framework");
 }
