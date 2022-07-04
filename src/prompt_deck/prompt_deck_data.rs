@@ -52,8 +52,8 @@ impl PromptDeckData {
         let deck_name = deck_name.into();
         self.current_session = match self.current_session.take() {
             Some(mut current_session) => {
-                let new_deck = PromptDeckLoader::load_deck(deck_name.clone());
-                current_session.deck.shuffle_in_deck(new_deck.unwrap());
+                let new_deck = PromptDeckLoader::load_deck(deck_name.clone())?;
+                current_session.deck.shuffle_in_deck(new_deck);
 
                 Some(current_session)
             }
