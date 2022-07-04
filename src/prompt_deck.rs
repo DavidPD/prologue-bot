@@ -162,11 +162,6 @@ impl PromptDeck {
         Ok(())
     }
 
-    #[poise::command(slash_command)]
-    async fn export_prompt_answers(ctx: Context<'_>) -> Result<(), Error> {
-        todo!();
-    }
-
     pub fn get_commands() -> Vec<poise::Command<Arc<RwLock<Data>>, Error>> {
         vec![
             Self::list_decks(),
