@@ -6,7 +6,7 @@ use std::{
     vec,
 };
 
-use poise::{AutocompleteChoice, CreateReply};
+use poise::AutocompleteChoice;
 use tokio::sync::RwLock;
 
 pub mod prompt_deck_data;
