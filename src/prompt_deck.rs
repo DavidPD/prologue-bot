@@ -1,14 +1,12 @@
 use std::{
-    fmt::format,
     fs::{self, DirEntry},
     io,
     path::Path,
-    result,
     sync::Arc,
     vec,
 };
 
-use poise::{futures_util::StreamExt, AutocompleteChoice};
+use poise::AutocompleteChoice;
 use tokio::sync::RwLock;
 
 pub mod prompt_deck_data;
@@ -42,10 +40,7 @@ impl PromptDeck {
 
     #[poise::command(slash_command)]
     async fn list_decks(ctx: Context<'_>) -> Result<(), Error> {
-        // let decks =
         let location = ctx.data().read().await.deck_location.clone();
-
-        // let mut result: Vec<String> = vec![];
 
         let result = get_available_decks(location);
 

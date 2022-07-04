@@ -58,7 +58,7 @@ mod tests {
 
     #[test]
     fn test_load_deck() {
-        let deck = PromptDeckLoader::load_deck("Assets/Prompt Files/test_deck.md")
+        let deck = PromptDeckLoader::load_deck("Assets/Test Prompt Files/test_deck.md")
             .expect("Error opening file");
 
         assert_eq!(deck.all_cards.iter().count(), 4);
