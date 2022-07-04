@@ -18,10 +18,10 @@ The Bot's customizable deck allows writers to "draw" random character and worldb
 #### Prompt Deck Commands
 
 - `/draw`: Randomly selects a card from the current deck.
-- `/list-decks`: Prints a list of all available prompt decks.
-- `/add-deck`: Adds all prompts from a given prompt deck.
-- `/start-prompt-session <session-name>`: Starts a prompt session with an optional name. Gives an error if there is already a named session in progress.
-- `/end-prompt-session`: Resets the current deck and ends a prompting session.
+- `/list_prompt_decks`: Prints a list of all available prompt decks.
+- `/add_prompt_deck`: Adds all prompts from a given prompt deck.
+- `/start_prompt_session <session-name>`: Starts a prompt session with an optional name. Gives an error if there is already a named session in progress.
+- `/end_prompt_session`: Resets the current deck and ends a prompting session.
 
 #### Tentative Roadmap
 

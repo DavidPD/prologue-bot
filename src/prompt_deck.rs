@@ -6,7 +6,7 @@ use std::{
     vec,
 };
 
-use poise::AutocompleteChoice;
+use poise::{AutocompleteChoice, CreateReply};
 use tokio::sync::RwLock;
 
 pub mod prompt_deck_data;
@@ -33,13 +33,15 @@ impl PromptDeck {
             }
         };
 
-        ctx.say(response).await?;
+        // ctx.say(response.clone()).await?;
+        ctx.send(|reply| reply.embed(|embed| embed.title(response)))
+            .await?;
 
         Ok(())
     }
 
     #[poise::command(slash_command)]
-    async fn list_decks(ctx: Context<'_>) -> Result<(), Error> {
+    async fn list_prompt_decks(ctx: Context<'_>) -> Result<(), Error> {
         let location = ctx.data().read().await.deck_location.clone();
 
         let result = get_available_decks(location);
@@ -126,7 +128,7 @@ impl PromptDeck {
     }
 
     #[poise::command(slash_command)]
-    async fn add_deck(
+    async fn add_prompt_deck(
         ctx: Context<'_>,
         #[autocomplete = "Self::autocomplete_deck_name"]
         #[description = "The name of the deck to add"]
@@ -154,10 +156,10 @@ impl PromptDeck {
 
     pub fn get_commands() -> Vec<poise::Command<Arc<RwLock<Data>>, Error>> {
         vec![
-            Self::list_decks(),
+            Self::list_prompt_decks(),
             Self::start_prompt_session(),
             Self::end_prompt_session(),
-            Self::add_deck(),
+            Self::add_prompt_deck(),
             Self::draw(),
         ]
     }
