@@ -10,6 +10,16 @@ pub struct Config {
 
 impl Config {
     pub fn load() -> Config {
+        Self::load_from_env()
+            .or_else(|| Some(Self::load_from_file()))
+            .expect("Error loading config")
+    }
+
+    fn load_from_env() -> Option<Config> {
+        envy::from_env::<Config>().ok()
+    }
+
+    fn load_from_file() -> Config {
         let mut file = File::open("config.toml").expect("Could not open config file");
 
         let mut config_string = String::new();
