@@ -13,4 +13,7 @@ RUN cargo build --release
 # Use any runner as you want
 # But beware that some images have old glibc which makes rust unhappy
 FROM fedora:34 AS runner
-COPY --from=builder /prod/target/release/rust-demo-server /bin
+COPY Assets Assets
+COPY --from=builder /prod/target/release/prologue-bot /bin
+
+CMD [ "prologue-bot" ]

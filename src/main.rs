@@ -20,6 +20,7 @@ async fn register(ctx: Context<'_>) -> Result<(), Error> {
 
 #[tokio::main]
 async fn main() {
+    println!("Testing Testing");
     let config = Config::load();
     let token = config.token;
     let prompt_file_location = config.prompt_file_location;

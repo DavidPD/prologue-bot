@@ -13,3 +13,8 @@ rand = "0.8.5"
 tap = "1.0.1"
 poise = "0.2.2"
 envy = "0.4"
+
+# Defining bin here to make multi stage docker build work
+[[bin]]
+name = "prologue-bot"
+path = "src/main.rs"
